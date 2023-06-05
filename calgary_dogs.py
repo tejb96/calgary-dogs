@@ -66,6 +66,12 @@ def main():
             f"The {dog_breed} was {round(percent_all_years, 6)}% of top breeds across all years."
         )
 
+        # 5. Find and print the months that were most popular for the selected breed registrations. Print all months that tie.
+        total_monthly = df_breed.groupby("Month").Total.sum()
+        mean = total_monthly.mean()
+        mask = total_monthly[total_monthly > mean]
+        print(mask)
+
         break
 
 
