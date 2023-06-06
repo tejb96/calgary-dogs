@@ -63,12 +63,14 @@ def main():
 
     # 3. Calculate and print the percentage of selected breed registrations out of the total percentage for each year (2021, 2022, 2023).
     years = [2021, 2022, 2023]
-    idx = pd.IndexSlice
-    for year in years:  # for years 2021, 2022, 2023
+    idx = pd.IndexSlice  # indexslice object
+    for year in years:
         if (
             year in top_breed_years
         ):  # if the breed was found in the top breeds for that year
-            total_yearly = df2.loc[idx[year, :], "Total"].sum()
+            total_yearly = df2.loc[
+                idx[year, :], "Total"
+            ].sum()  # using the indexslice object
             total_breed_yearly = df_breed.loc[
                 idx[year, :], "Total"
             ].sum()  # calculate the percentage
