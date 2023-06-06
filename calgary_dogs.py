@@ -11,6 +11,19 @@ import pandas as pd
 
 
 def dog_breed_check(dog_breed, df):
+    """
+    Check if the given dog breed is present in the DataFrame.
+
+    Args:
+        dog_breed (str): The dog breed to check.
+        df (DataFrame): The DataFrame containing the dog breed data.
+
+    Returns:
+        str: The uppercase dog breed if found.
+
+    Raises:
+        ValueError: If the dog breed is not found in the data.
+    """
     if df.Breed.str.contains(f"(?i)^{dog_breed}$", regex=True).any():
         return dog_breed.upper()
 
@@ -20,22 +33,26 @@ def dog_breed_check(dog_breed, df):
 def main():
     # Import data here
     df = pd.read_excel("CalgaryDogBreeds.xlsx")
-    df2 = df.set_index(["Year", "Breed"])
+    df2 = df.set_index(["Year", "Breed"])  # Creating multi-index pandas dataframe
     print("ENSF 592 Dogs of Calgary")
 
     # User input stage
-    while True:
+    while True:  # Loop that breaks with valid user input
         dog_breed = input("Please enter a dog breed: ")
         try:
-            dog_breed = dog_breed_check(dog_breed, df)
+            dog_breed = dog_breed_check(
+                dog_breed, df
+            )  # To check if user input is valid
             break
-        except ValueError as value_err:
+        except ValueError as value_err:  # Error message if it is not
             print(str(value_err))
 
     # Data anaylsis stage
 
     # 1. Find and print all years where the selected breed was listed in the top breeds.
-    df_breed = df2.loc[(slice(None), dog_breed), :]
+    df_breed = df2.loc[
+        (slice(None), dog_breed), :
+    ]  # Creating dataframe that only contains data for the selected breed
 
     top_breed_years = df_breed.index.get_level_values("Year").unique()
     print(f"The {dog_breed} was found in the top breeds for years:", *top_breed_years)
@@ -45,14 +62,26 @@ def main():
     print("There have been", total_breed, f"{dog_breed} dogs registered total.")
 
     # 3. Calculate and print the percentage of selected breed registrations out of the total percentage for each year (2021, 2022, 2023).
+    years = [2021, 2022, 2023]
     idx = pd.IndexSlice
-    for year in top_breed_years:
-        total_yearly = df2.loc[idx[year, :], "Total"].sum()
-        total_breed_yearly = df_breed.loc[idx[year, :], "Total"].sum()
-        percent_yearly = (total_breed_yearly / total_yearly) * 100
-        print(
-            f"The {dog_breed} was {round(percent_yearly, 6)}% of top breed in {year}."
-        )
+    for year in years:  # for years 2021, 2022, 2023
+        if (
+            year in top_breed_years
+        ):  # if the breed was found in the top breeds for that year
+            total_yearly = df2.loc[idx[year, :], "Total"].sum()
+            total_breed_yearly = df_breed.loc[
+                idx[year, :], "Total"
+            ].sum()  # calculate the percentage
+            percent_yearly = (total_breed_yearly / total_yearly) * 100
+            print(
+                f"The {dog_breed} was {round(percent_yearly, 6)}% of top breed in {year}."  # and print it
+            )
+
+        else:
+            print(
+                f"The {dog_breed} was 0.0% of top breed in {year}."
+            )  # otherwise print 0.0% for that year
+
     # 4. Calculate and print the percentage of selected breed registrations out of the total three-year percentage.
     total_all_years = df2.Total.sum()
     percent_all_years = (total_breed / total_all_years) * 100
